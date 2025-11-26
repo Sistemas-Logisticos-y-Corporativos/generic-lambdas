@@ -46,48 +46,6 @@ graph TB
     style SAPSL fill:#0078D7
 ```
 
-## Flujo de Ejecución Detallado
-
-```mermaid
-sequenceDiagram
-    participant EB as EventBridge
-    participant Lambda as Lambda Handler
-    participant SM as Secrets Manager
-    participant CW as CloudWatch
-    participant DB as SAP Database
-    participant SL as SAP Service Layer
-    
-    EB->>Lambda: Trigger (every 2 min)
-    Lambda->>CW: Log: Handler invoked
-    
-    Lambda->>SM: GetSecretValue(SECRET_NAME)
-    SM-->>Lambda: Return credentials + config
-    Lambda->>CW: Log: Secrets loaded
-    
-    Note over Lambda: Load env variables:<br/>SAP_SERVER, SAP_USERNAME_DB,<br/>SAP_PASSWORD_DB, SAP_USERNAME,<br/>SAP_PASSWORD, SAP_BASE_URL,<br/>SAP_DBS
-    
-    loop For each Database in SAP_DBS
-        Lambda->>DB: Execute SQL Query (ORDR table)
-        Note over DB: Calculate difference:<br/>DocTotal/FC - SumPlazos
-        DB-->>Lambda: Return orders with difference != 0
-        Lambda->>CW: Log: Orders found per DB
-        
-        Lambda->>SL: POST /Login (CompanyDB, User, Pass)
-        SL-->>Lambda: Return B1SESSION + ROUTEID cookies
-        Lambda->>CW: Log: Login successful
-        
-        loop For each Order with difference
-            Lambda->>SL: PATCH /Orders(DocEntry)<br/>{U_Monto_Plazo: newValue}
-            SL-->>Lambda: 204 No Content (success)
-            Lambda->>CW: Log: Order updated
-        end
-    end
-    
-    Lambda->>DB: Close connection
-    Lambda->>CW: Log: Final summary
-    Lambda-->>EB: Return response with results
-```
-
 ## Estructura del Proyecto
 
 ```
