@@ -37,8 +37,8 @@ graph TB
     SAPSL -->|Session Cookies<br/>B1SESSION + ROUTEID| Lambda
     Lambda -->|Update Orders<br/>PATCH /Orders| SAPSL
     
-    style EB fill:#FF9900
-    style Lambda fill:#FF9900
+    style EB fill:#A020F0
+    style Lambda fill:#D53507
     style SM fill:#DD344C
     style CW fill:#FF9900
     style Layer fill:#FF9900
@@ -142,19 +142,6 @@ Cliente unificado para SAP:
 - **Autenticación API**: Login en Service Layer con obtención de cookies de sesión
 - **Actualización**: PATCH requests para ajustar campos `U_Monto_Plazo*`
 
-### Secrets Manager Service
-Obtiene credenciales desde AWS Secrets Manager:
-```json
-{
-  "SAP_BASE_URL_DB": "servidor-sap.com",
-  "SAP_BASE_URL": "https://service-layer.com:50000/b1s/v1",
-  "SAP_USERNAME_DB": "user_db",
-  "SAP_PASSWORD_DB": "pass_db",
-  "SAP_USERNAME": "user_api",
-  "SAP_PASSWORD": "pass_api",
-  "SAP_DBS": "[\"DB1\", \"DB2\", \"DB3\"]"
-}
-```
 
 ## Configuración de AWS SAM
 
@@ -299,13 +286,8 @@ Crear un secreto con formato JSON:
 
 ```json
 {
-  "SAP_BASE_URL_DB": "your-sap-server.com",
-  "SAP_BASE_URL": "https://your-service-layer:50000/b1s/v1",
-  "SAP_USERNAME_DB": "db_user",
-  "SAP_PASSWORD_DB": "db_password",
-  "SAP_USERNAME": "api_user",
-  "SAP_PASSWORD": "api_password",
-  "SAP_DBS": "[\"DatabaseName1\", \"DatabaseName2\"]"
+  "Ejemplo_env_1": "",
+  "Ejemplo_env_2": "",
 }
 ```
 
@@ -403,39 +385,6 @@ Los logs se almacenan en:
 
 El sistema ejecuta esta query SQL en cada base de datos:
 
-```sql
-WITH DatosConDiferencia AS (
-    SELECT
-        a.DocEntry,
-        a.docnum,
-        a.DocTotal,
-        a.DocTotalFC,
-        a.U_Monto_Plazo1,
-        a.U_Monto_Plazo2,
-        a.U_Monto_Plazo3,
-        a.U_CantPlazos,
-        (ISNULL(a.U_Monto_Plazo1, 0) + 
-         ISNULL(a.U_Monto_Plazo2, 0) + 
-         ISNULL(a.U_Monto_Plazo3, 0)) AS SumaPlazos,
-        CASE WHEN a.doccur = 'USD' THEN
-            (a.DocTotalFC - (ISNULL(a.U_Monto_Plazo1, 0) + 
-                             ISNULL(a.U_Monto_Plazo2, 0) + 
-                             ISNULL(a.U_Monto_Plazo3, 0)))
-        ELSE
-            (a.DocTotal - (ISNULL(a.U_Monto_Plazo1, 0) + 
-                           ISNULL(a.U_Monto_Plazo2, 0) + 
-                           ISNULL(a.U_Monto_Plazo3, 0)))
-        END AS Diferencia
-    FROM dbo.ordr a
-    INNER JOIN OCRD b ON b.CardCode = a.CardCode
-    WHERE CAST(a.docdate AS DATE) >= '2025-11-25'
-      AND b.U_TipoPlazo NOT IN (5)
-)
-SELECT *
-FROM DatosConDiferencia
-WHERE Diferencia <> 0
-```
-
 ### Cálculo de Ajuste
 
 1. Identifica el campo a actualizar según `U_CantPlazos`:
@@ -450,37 +399,6 @@ WHERE Diferencia <> 0
 
 3. Actualiza mediante SAP Service Layer API
 
-### Respuesta del Sistema
-
-```json
-{
-  "trackingId": "uuid-v4",
-  "status": "SUCCESS",
-  "mensaje": "Se ajustaron X facturas mediante SAP Service Layer API",
-  "totalExaminadas": 50,
-  "totalAjustadas": 45,
-  "totalConError": 5,
-  "facturasAjustadas": [
-    {
-      "DocEntry": 12345,
-      "DocNum": "OV-2025-001",
-      "campoAjustado": "U_Monto_Plazo2",
-      "valorAnterior": 100.00,
-      "valorNuevo": 105.50,
-      "diferencia": 5.50,
-      "dbName": "SBO_Company1"
-    }
-  ],
-  "facturasConError": [
-    {
-      "DocEntry": 12346,
-      "DocNum": "OV-2025-002",
-      "dbName": "SBO_Company2",
-      "error": "Login falló: Connection timeout"
-    }
-  ]
-}
-```
 
 ## Seguridad
 
@@ -496,13 +414,6 @@ Policies:
       Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}*"
 ```
 
-### Mejores Prácticas
-
-1. **Secretos**: Nunca hardcodear credenciales en código
-2. **VPC**: Considerar ejecutar Lambda dentro de VPC si SAP está en red privada
-3. **Encryption**: Habilitar encryption at rest para logs de CloudWatch
-4. **Least Privilege**: IAM role con permisos mínimos necesarios
-5. **HTTPS**: Todas las conexiones a SAP Service Layer usan TLS (con `rejectUnauthorized: false` para certs autofirmados)
 
 ## Troubleshooting
 
@@ -540,25 +451,6 @@ sam deploy --config-env dev
 - Verificar filtro de fechas en query
 - Revisar que `U_TipoPlazo` y `U_CantPlazos` estén configurados
 - Validar permisos del usuario DB
-
-## Roadmap
-
-- [ ] Agregar validación de esquemas con Joi
-- [ ] Implementar tests unitarios con Jest
-- [ ] Agregar soporte para múltiples regiones AWS
-- [ ] Dashboard de métricas en CloudWatch
-- [ ] Notificaciones SNS para errores críticos
-- [ ] Retry logic con exponential backoff
-- [ ] Dead Letter Queue (DLQ) para eventos fallidos
-
-## Contribuciones
-
-Para contribuir al proyecto:
-
-1. Crear branch desde `main`
-2. Implementar cambios con tests
-3. Actualizar documentación si aplica
-4. Crear Pull Request
 
 ## Licencia
 
