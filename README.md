@@ -55,17 +55,13 @@ generic-lambdas/
 │   │   └── syncQuotaSAP.js          # Handler principal
 │   ├── controllers/                  # Lógica de negocio
 │   │   └── syncQuotaSAP.controller.js
-│   ├── service/                      # Servicios externos
+│   ├── services/                      # Servicios externos
 │   │   ├── sap-service.js           # Interacción con SAP DB y Service Layer
 │   │   └── secrets-manager-service.js # Cliente AWS Secrets Manager
 │   ├── utils/                        # Utilidades
 │   │   └── tools.js                 # Helpers (carga de secretos)
 │   └── schemas/                      # Validaciones (vacío actualmente)
 ├── dependencies/                     # Lambda Layer
-│   ├── nodejs/                       # Estructura requerida por AWS
-│   │   ├── package.json             # Dependencias del layer
-│   │   └── node_modules/            # Generado por install-layer.ps1
-│   └── README.md
 ├── coverage/                         # Reportes de pruebas (generado)
 ├── template.yaml                     # SAM template principal
 ├── template-layer.yaml               # SAM template para layer independiente
@@ -85,21 +81,13 @@ Punto de entrada de Lambda que:
 
 ### Controller (`syncQuotaSAP.controller.js`)
 Orquesta la lógica de sincronización:
-1. Genera tracking ID único (UUID)
-2. Crea instancia de `SapService`
-3. Consulta órdenes con discrepancias en múltiples DBs
-4. Para cada DB:
-   - Hace login en SAP Service Layer
-   - Actualiza órdenes con diferencias
-5. Cierra conexiones y retorna resumen
+1. Maneja operaciones logicas, llamadas a servicios
+2. Se predispone la respuesta y los datos que llevara
 
-### SAP Service (`sap-service.js`)
+### Services (`sap-service.js`)
 Cliente unificado para SAP:
-- **Conexión DB**: Pool de conexiones MSSQL con cifrado TLS
-- **Consulta Órdenes**: Query SQL que calcula diferencias entre `DocTotal/DocTotalFC` y suma de plazos (`U_Monto_Plazo1/2/3`)
-- **Autenticación API**: Login en Service Layer con obtención de cookies de sesión
-- **Actualización**: PATCH requests para ajustar campos `U_Monto_Plazo*`
-
+- **Conexiónes DB**: Pool de conexiones MSSQL con cifrado TLS
+- **Consulta servicios externos**: Se encarga de consultar tanto db y apis externas para manejar errores fuera de nuestro controlador  
 
 ## Configuración de AWS SAM
 
