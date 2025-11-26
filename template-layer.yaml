@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  ENV:
+    Type: String
+    Default: dev
+
+Resources:
+  GenericToolsDependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub "generic-tools-dependencies-${ENV}"
+      Description: Dependencies layer for generic-tools Lambda functions
+      ContentUri: ./dependencies/
+      CompatibleRuntimes:
+        - nodejs20.x
+      CompatibleArchitectures:
+        - arm64
+    Metadata:
+      BuildMethod: nodejs20.x
+
+Outputs:
+  GenericToolsDependenciesLayerArn:
+    Description: ARN of the dependencies layer
+    Value: !Ref GenericToolsDependenciesLayer
+    Export:
+      Name: !Sub "generic-tools-dependencies-layer-${ENV}"

@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "joi": "^18.0.2",
+    "loglevel": "^1.9.2",
+    "@aws-sdk/client-secrets-manager": "^3.0.0",
+    "axios": "^1.6.0",
+    "mssql": "^10.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "aws-sam-local": "^0.2.11"
+  }
+}

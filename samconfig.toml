@@ -1,0 +1,63 @@
+version = 0.1
+
+[default.global.parameters]
+stack_name = "generic-lambdas"
+
+[default.build.parameters]
+cached = true
+parallel = true
+
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+parameter_overrides = "ENV=dev LogLevel=trace SecretName=Secret_lambda"
+
+
+# ========================================
+# Configuración para ambiente DEV
+# ========================================
+[dev.global.parameters]
+stack_name = "generic-lambdas-dev"
+
+[dev.build.parameters]
+cached = true
+parallel = true
+
+[dev.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+parameter_overrides = "ENV=dev LogLevel=trace SecretName=Secret_lambda"
+
+# ========================================
+# Configuración para ambiente QA
+# ========================================
+[qa.global.parameters]
+stack_name = "generic-lambdas-qa"
+
+[qa.build.parameters]
+cached = true
+parallel = true
+
+[qa.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+parameter_overrides = "ENV=qa LogLevel=debug SecretName=slc-update-orders-sap-secrets-qa"
+
+# ========================================
+# Configuración para ambiente PROD
+# ========================================
+[prod.global.parameters]
+stack_name = "generic-lambdas-prod"
+
+[prod.build.parameters]
+cached = true
+parallel = true
+
+[prod.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = false
+resolve_s3 = true
+parameter_overrides = "ENV=prod LogLevel=debug SecretName=Secret_lambda"
