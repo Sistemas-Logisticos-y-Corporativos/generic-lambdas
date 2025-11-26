@@ -40,8 +40,8 @@ graph TB
     style EB fill:#A020F0
     style Lambda fill:#D53507
     style SM fill:#DD344C
-    style CW fill:#FF9900
-    style Layer fill:#FF9900
+    style CW fill:#6C1413
+    style Layer fill:#D53507
     style SAPDB fill:#0078D7
     style SAPSL fill:#0078D7
 ```
