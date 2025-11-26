@@ -318,16 +318,6 @@ Los logs se almacenan en:
 - DEV: `trace` (máximo detalle)
 - QA/PROD: `debug`
 
-### Estructura de Logs
-
-```
-[syncQuotaSAP Handler] Handler invoked
-[syncQuotaSAP - {UUID}] sapService creado
-[syncQuotaSAP - {UUID}] Consultando órdenes con diferencias
-[SAP DB] DB: DatabaseName - Registros con diferencia encontrados: X
-[SAP API] Login exitoso para DB: DatabaseName
-[syncQuotaSAP - {UUID}] [DatabaseName] Ajustando DocEntry X, Campo: U_Monto_Plazo2, De 100 a 105
-[syncQuotaSAP - {UUID}] [DatabaseName] DocEntry X ajustado exitosamente
 ```
 
 ### Métricas Recomendadas
@@ -342,20 +332,6 @@ Los logs se almacenan en:
 ### Detección de Discrepancias
 
 El sistema ejecuta esta query SQL en cada base de datos:
-
-### Cálculo de Ajuste
-
-1. Identifica el campo a actualizar según `U_CantPlazos`:
-   - `U_CantPlazos = 1` → Ajusta `U_Monto_Plazo1`
-   - `U_CantPlazos = 2` → Ajusta `U_Monto_Plazo2`
-   - `U_CantPlazos = 3` → Ajusta `U_Monto_Plazo3`
-
-2. Calcula nuevo valor:
-   ```
-   nuevoValor = valorActual + Diferencia
-   ```
-
-3. Actualiza mediante SAP Service Layer API
 
 
 ## Seguridad
@@ -405,10 +381,7 @@ sam deploy --config-env dev
 
 **Causa**: Query SQL no retorna resultados.
 
-**Solución**:
-- Verificar filtro de fechas en query
-- Revisar que `U_TipoPlazo` y `U_CantPlazos` estén configurados
-- Validar permisos del usuario DB
+
 
 ## Licencia
 
