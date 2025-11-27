@@ -64,7 +64,7 @@ Resources:
         ScheduledEvent:
           Type: Schedule
           Properties:
-            Schedule: rate(2 minutes)
+            Schedule: rate(5 minutes)
             Input: '{}'
             Enabled: true
       CodeUri: syncQuotaSAP

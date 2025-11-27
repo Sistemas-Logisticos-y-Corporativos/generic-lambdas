@@ -1,7 +1,7 @@
 const log = require('loglevel');
 log.setLevel(process.env.LOG_LEVEL || 'info');
 const { v4: uuidv4 } = require('uuid');
-const SapService = require('../service/sap-service');
+const SapService = require('../services/sap-service');
 
 const createResponse = (trackingId, data) => ({ trackingId, ...data });
 

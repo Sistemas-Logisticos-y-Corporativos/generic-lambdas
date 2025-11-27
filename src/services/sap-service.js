@@ -54,6 +54,7 @@ class SapService {
           headers: {
             'Content-Type': 'application/json'
           },
+          timeout: 240000,
           httpsAgent: new (require('https').Agent)({
             rejectUnauthorized: false
           })
@@ -74,7 +75,7 @@ class SapService {
           }
         });
       }
-
+      console.log('[TimeoutStat] tiempo de request Login: ', response.headers['request-duration-ms'], 'ms');
       console.log('[SAP API] Login exitoso');
       return true;
     } catch (error) {
@@ -103,12 +104,13 @@ class SapService {
             'Content-Type': 'application/json',
             'Cookie': `B1SESSION=${this.sessionId}; ROUTEID=${this.routeId}`
           },
+          timeout: 240000,
           httpsAgent: new (require('https').Agent)({
             rejectUnauthorized: false
           })
         }
       );
-
+      console.log('[TimeoutStat] tiempo de request UpdateOrder: ', response.headers['request-duration-ms'], 'ms');
       console.log(`[SAP API] Orden ${docEntry} actualizada exitosamente`);
       return true;
     } catch (error) {

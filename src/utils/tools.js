@@ -1,5 +1,5 @@
 const log = require('loglevel');
-const SecretsManagerService = require('../service/secrets-manager-service');
+const SecretsManagerService = require('../services/secrets-manager-service');
 
 const loadSecretsToEnv = async () => {
   if (process.env.SECRETS_LOADED === 'true') {

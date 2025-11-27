@@ -14,7 +14,7 @@ Sistema serverless construido con AWS SAM para la sincronización automatizada d
 ```mermaid
 graph TB
     subgraph "AWS Cloud"
-        EB[EventBridge Schedule<br/>Rate: 2 minutes]
+        EB[EventBridge Schedule<br/>Rate: 5 minutes]
         Lambda[Lambda Function<br/>syncQuotaSAP<br/>Node.js 20.x ARM64]
         SM[AWS Secrets Manager<br/>Credentials & Config]
         CW[CloudWatch Logs<br/>Retention: 90 days]
@@ -108,7 +108,7 @@ Define la infraestructura completa:
   - Timeout: 900s (15 min)
   - Memory: 512 MB
   - IAM Policy: Acceso a Secrets Manager
-  - Event: Schedule de EventBridge (rate: 2 minutes)
+  - Event: Schedule de EventBridge (rate: 5 minutes)
 
 ### Configuración Multi-Ambiente (`samconfig.toml`)
 
