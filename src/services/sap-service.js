@@ -9,8 +9,7 @@ class SapService {
       user: dbUsername,
       password: dbPassword,
       options: {
-        encrypt: true,
-        trustServerCertificate: true,
+        encrypt: false,
         enableArithAbort: true
       },
       pool: {
@@ -36,7 +35,8 @@ class SapService {
       }
       return this.pool;
     } catch (error) {
-      console.error('[SAP DB ERROR] Error al conectar:', error.message);
+      console.error('[SAP DB ERROR] Error completo al conectar:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error('[SAP DB ERROR] Stack trace:', error.stack);
       throw new Error(`Error al conectar a SAP DB: ${error.message}`);
     }
   }
@@ -75,7 +75,6 @@ class SapService {
           }
         });
       }
-      console.log('[TimeoutStat] tiempo de request Login: ', response.headers['request-duration-ms'], 'ms');
       console.log('[SAP API] Login exitoso');
       return true;
     } catch (error) {
@@ -110,7 +109,6 @@ class SapService {
           })
         }
       );
-      console.log('[TimeoutStat] tiempo de request UpdateOrder: ', response.headers['request-duration-ms'], 'ms');
       console.log(`[SAP API] Orden ${docEntry} actualizada exitosamente`);
       return true;
     } catch (error) {
